@@ -64,7 +64,7 @@ function ServicesPage() {
           
           <div className="relative h-[400px] w-full rounded-3xl overflow-hidden bg-muted border border-border">
             <img 
-              src="https://images.unsplash.com/photo-1541888082425-eb1bbd92a400?q=80&w=2070&auto=format&fit=crop" 
+              src="https://images.pexels.com/photos/2244746/pexels-photo-2244746.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
               alt="مهندس في موقع بناء" 
               className="h-full w-full object-cover opacity-80"
             />

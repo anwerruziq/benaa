@@ -32,7 +32,7 @@ function AboutPage() {
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl bg-muted/30 shadow-2xl">
             {/* Image Placeholder */}
             <img 
-              src="https://images.unsplash.com/photo-1541888086425-d81bb19240f5?q=80&w=2070&auto=format&fit=crop" 
+              src="https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
               alt="مهندس في موقع العمل" 
               className="h-full w-full object-cover"
             />
@@ -126,7 +126,7 @@ function AboutPage() {
       <section className="relative mt-12 mb-24 overflow-hidden rounded-3xl mx-6 xl:mx-auto xl:max-w-7xl">
         <div className="absolute inset-0 bg-background/80">
           <img 
-            src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2062&auto=format&fit=crop" 
+            src="https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
             alt="موقع بناء" 
             className="h-full w-full object-cover opacity-20 mix-blend-overlay"
           />

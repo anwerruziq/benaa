@@ -4,21 +4,25 @@ import { useState, useRef, useEffect } from "react";
 import {
   ChevronDown,
   Building2, HardHat, Ruler, ShieldCheck, BadgeCheck,
-  PhoneCall, MapPin
+  PhoneCall, MapPin, Mail, Clock, ArrowLeft, Star, CheckCircle2,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { AnimatedCounter } from "../components/AnimatedCounter";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/")(({
   head: () => ({
     meta: [
-      { title: "بناء للمقاولات   " },
+      { title: "بناء للمقاولات" },
       { name: "description", content: "شركة بناء للمقاولات — خبرة عشرين عاماً في البناء والتشييد والمقاولات العامة بأعلى معايير الجودة." },
       { property: "og:title", content: "بناء للمقاولات" },
       { property: "og:description", content: "نبني المستقبل بأيدٍ خبيرة وتقنيات حديثة." },
     ],
+    links: [
+      { rel: "icon", type: "image/png", href: "/logo.png" },
+    ],
   }),
   component: Index,
-});
+} as Parameters<typeof createFileRoute<"/">>[0]));
 
 const VIDEO_URL = "/YouCut_20260624_205134948.mp4";
 
@@ -30,10 +34,10 @@ const SERVICES = [
 ];
 
 const STATS = [
-  { value: "+٢٠", label: "عاماً من الخبرة" },
-  { value: "+٣٥٠", label: "مشروع منجز" },
-  { value: "+١٢٠٠", label: "عميل راضٍ" },
-  { value: "١٠٠٪", label: "التزام بالمواعيد" },
+  { targetValue: 20, prefix: "+", label: "عاماً من الخبرة" },
+  { targetValue: 350, prefix: "+", label: "مشروع منجز" },
+  { targetValue: 1200, prefix: "+", label: "عميل راضٍ" },
+  { targetValue: 100, suffix: "٪", label: "التزام بالمواعيد" },
 ];
 
 const PROJECTS = [
@@ -46,13 +50,19 @@ const PROJECTS = [
 ];
 
 const FAQ = [
-  { q: "ما هي المناطق الجغرافية التي تغطيها الشركة؟", a: "نعمل في جميع مناطق المملكة العربية السعودية، ولدينا مشاريع في عدة دول خليجية." },
+  { q: "ما هي المناطق الجغرافية التي تغطيها الشركة؟", a: "نعمل في جميع مناطق اليمن، ولدينا مشاريع في عدة دول خليجية." },
   { q: "كيف يمكنني الحصول على عرض سعر؟", a: "تواصل معنا عبر الهاتف أو النموذج أدناه، وسيرد عليك فريقنا الهندسي خلال 24 ساعة بعرض سعر مفصّل." },
   { q: "هل تقدمون ضماناً على الأعمال المنفذة؟", a: "نعم، نقدم ضماناً هيكلياً لمدة 10 سنوات على الأعمال الإنشائية و5 سنوات على أعمال التشطيب." },
   { q: "هل يمكنكم تنفيذ مشاريع حكومية وكبرى؟", a: "نعم، لدينا تصنيف مقاولين درجة أولى ونؤهلنا لتنفيذ المشاريع الحكومية والمنافسة في المناقصات الكبرى." },
 ];
 
-// ─── Scroll-reveal with blur ────────────────────────────────────────────────
+const TESTIMONIALS = [
+  { name: "م. خالد العمري", role: "مدير مشاريع، مجموعة العمري", text: "تعاملنا مع بناء في مشروع برج سكني كبير، وكانت الجودة والالتزام بالمواعيد أفضل من توقعاتنا بكثير.", stars: 5 },
+  { name: "أ. سارة المطيري", role: "مديرة تطوير عقاري", text: "شركة محترفة بكل معنى الكلمة. الفريق الهندسي متعاون والتشطيبات في أعلى مستوى.", stars: 5 },
+  { name: "م. يوسف الحارثي", role: "صاحب مشروع فلل الساحل", text: "أنجزوا مشروع الفلل قبل الموعد المحدد بأسبوعين وبجودة فاقت المواصفات المتفق عليها.", stars: 5 },
+];
+
+// ─── Scroll-reveal ───────────────────────────────────────────────────────────
 function useReveal() {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -61,7 +71,7 @@ function useReveal() {
     if (!el) return;
     const obs = new IntersectionObserver(
       ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } },
-      { threshold: 0.12 },
+      { threshold: 0.08 },
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -71,24 +81,15 @@ function useReveal() {
 
 function RevealSection({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const { ref, visible } = useReveal();
-  // Use lighter animation on mobile to avoid GPU overload
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    setIsMobile(window.innerWidth < 768);
-  }, []);
-
-  const translateY = isMobile ? "28px" : "56px";
-  const blurAmt = isMobile ? "4px" : "8px";
   return (
     <div
       ref={ref}
       className={className}
       style={{
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : `translateY(${translateY})`,
-        filter: visible ? "blur(0px)" : `blur(${blurAmt})`,
-        transition: `opacity 0.7s cubic-bezier(0.16,1,0.3,1) ${delay}s, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${delay}s, filter 0.7s cubic-bezier(0.16,1,0.3,1) ${delay}s`,
+        transform: visible ? "translateY(0)" : "translateY(48px)",
+        filter: visible ? "blur(0px)" : "blur(6px)",
+        transition: `opacity 0.75s cubic-bezier(0.16,1,0.3,1) ${delay}s, transform 0.75s cubic-bezier(0.16,1,0.3,1) ${delay}s, filter 0.75s cubic-bezier(0.16,1,0.3,1) ${delay}s`,
         willChange: "opacity, transform",
       }}
     >
@@ -97,52 +98,47 @@ function RevealSection({ children, className = "", delay = 0 }: { children: Reac
   );
 }
 
-// ─── Main Component ─────────────────────────────────────────────────────────
+// ─── Main Component ──────────────────────────────────────────────────────────
 function Index() {
   const heroRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [mounted, setMounted] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => { setMounted(true); }, []);
 
-  /* ── Smooth scroll-driven video (lerp / RAF approach) ──────────────── */
+  /* ── Scroll-driven video — longer scrub range, smoother lerp ─────────── */
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     let duration = 0;
     let rafId: number;
-    let currentSmooth = 0;          // smoothed currentTime value
+    let currentSmooth = 0;
     const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-    // On mobile use stronger smoothing (closer to 1 = slower lerp)
-    const LERP_FACTOR = isMobile ? 0.06 : 0.12;
+    const LERP_FACTOR = isMobile ? 0.04 : 0.08; // slower = smoother
 
-    const clamp = (v: number, lo: number, hi: number) =>
-      v < lo ? lo : v > hi ? hi : v;
+    const clamp = (v: number, lo: number, hi: number) => v < lo ? lo : v > hi ? hi : v;
 
     const getTargetTime = (): number => {
       const hero = heroRef.current;
       if (!hero || duration <= 0) return 0;
       const rect = hero.getBoundingClientRect();
-      const range = Math.max(1, hero.offsetHeight - window.innerHeight);
-      const progress = clamp(-rect.top / range, 0, 1);
-      return progress * (duration - 0.05);
+      // Use full scrollable range of hero
+      const scrollableRange = Math.max(1, hero.offsetHeight - window.innerHeight);
+      const progress = clamp(-rect.top / scrollableRange, 0, 1);
+      // Map to full video duration (leave 0.1s buffer at end)
+      return progress * (duration - 0.1);
     };
 
     const tick = () => {
       rafId = requestAnimationFrame(tick);
       if (duration <= 0) return;
-
       const target = getTargetTime();
-      // Lerp the smooth value toward the target each frame
       currentSmooth += (target - currentSmooth) * LERP_FACTOR;
-
       const diff = Math.abs(currentSmooth - video.currentTime);
-      // Only update if the difference is meaningful (avoids unnecessary seeks)
-      if (diff > 0.02) {
-        try { video.currentTime = clamp(currentSmooth, 0, duration - 0.05); } catch { /* ignore */ }
+      if (diff > 0.015) {
+        try { video.currentTime = clamp(currentSmooth, 0, duration - 0.1); } catch { /* ignore */ }
       }
     };
 
@@ -163,47 +159,53 @@ function Index() {
     };
   }, []);
 
-  /* ── Blur background on scroll (RAF-throttled) ────────────────────── */
+  /* ── Video overlay opacity on scroll (less aggressive darkening) ──────── */
   useEffect(() => {
     let rafPending = false;
 
     const updateBg = () => {
       rafPending = false;
       const hero = heroRef.current;
-      const bg = document.getElementById("video-bg-container");
+      const overlay = document.getElementById("video-overlay");
       const textEl = document.getElementById("hero-main-text");
-      if (!hero || !bg) return;
+      if (!hero) return;
+
       const rect = hero.getBoundingClientRect();
       const overscroll = Math.max(0, window.innerHeight - rect.bottom);
+      const scrollY = window.scrollY;
 
+      // Text parallax + fade
       if (textEl) {
-        const scrollY = window.scrollY;
-        const textOpacity = Math.max(0, 1 - scrollY / 500);
-        const textTransform = scrollY * 0.35;
-        const textBlur = Math.min(scrollY / 80, 15);
+        const textOpacity = Math.max(0, 1 - scrollY / 600);
         textEl.style.opacity = `${textOpacity}`;
-        textEl.style.transform = `translateY(${-textTransform}px)`;
-        textEl.style.filter = `blur(${textBlur}px)`;
+        textEl.style.transform = `translateY(${-scrollY * 0.28}px)`;
+        textEl.style.filter = `blur(${Math.min(scrollY / 100, 12)}px)`;
       }
 
-      if (overscroll > 0) {
-        const blurVal = Math.min(overscroll / 18, 18);
-        const opacityVal = Math.max(0.45, 1 - overscroll / 600);
-        bg.style.filter = `blur(${blurVal.toFixed(1)}px)`;
-        bg.style.opacity = `${opacityVal.toFixed(3)}`;
-        bg.style.transform = `scale(${(1 + blurVal / 120).toFixed(4)})`;
-      } else {
-        bg.style.filter = "";
-        bg.style.opacity = "";
-        bg.style.transform = "";
+      // Overlay stays light (max 0.55 opacity) so video is always vivid
+      if (overlay) {
+        const progress = clamp(scrollY / 400, 0, 1);
+        overlay.style.opacity = `${0.25 + progress * 0.3}`;
+      }
+
+      // Bg blur only when hero leaves viewport
+      const bg = document.getElementById("video-bg-container");
+      if (bg) {
+        if (overscroll > 0) {
+          const blurVal = Math.min(overscroll / 22, 14);
+          bg.style.filter = `blur(${blurVal.toFixed(1)}px)`;
+          bg.style.opacity = `${Math.max(0.5, 1 - overscroll / 700)}`;
+        } else {
+          bg.style.filter = "";
+          bg.style.opacity = "1";
+        }
       }
     };
 
+    const clamp = (v: number, lo: number, hi: number) => v < lo ? lo : v > hi ? hi : v;
+
     const onScroll = () => {
-      if (!rafPending) {
-        rafPending = true;
-        requestAnimationFrame(updateBg);
-      }
+      if (!rafPending) { rafPending = true; requestAnimationFrame(updateBg); }
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -213,73 +215,83 @@ function Index() {
   return (
     <div className="relative min-h-screen" dir="rtl">
 
-      {/* ── FIXED VIDEO BACKGROUND ─────────────────────────────────────── */}
+      {/* ── FIXED VIDEO BACKGROUND ──────────────────────────────────────── */}
       <div
         id="video-bg-container"
-        className="fixed inset-0 z-0 h-screen w-full origin-center"
-        style={{ willChange: "filter, opacity, transform" }}
+        className="fixed inset-0 z-0 h-screen w-full"
+        style={{ willChange: "filter, opacity" }}
       >
         <video
           ref={videoRef}
           className="absolute inset-0 h-full w-full object-cover"
-          style={{
-            transform: "translateZ(0)",
-            backfaceVisibility: "hidden",
-            willChange: "transform",
-          }}
+          style={{ transform: "translateZ(0)", backfaceVisibility: "hidden", willChange: "transform" }}
           src={VIDEO_URL}
           muted
           playsInline
           preload="auto"
           disablePictureInPicture
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/80" />
+        {/* Static gradient base — light overlay so video is vivid */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60" />
+        {/* Dynamic overlay controlled by JS */}
+        <div id="video-overlay" className="absolute inset-0 bg-black/25 transition-none" />
       </div>
 
-      {/* Navigation moved to layout */}
-
-      {/* ── Hero (scroll-driven video zone) ──────────────────────────────── */}
-      {/* Mobile: 200vh is enough; desktop: 320vh for longer scrub */}
-      <section ref={heroRef} id="start" className="relative z-10 -mt-24 h-[200vh] md:h-[320vh]">
+      {/* ── Hero (scroll-driven video zone) — 480vh for full video playback ── */}
+      <section ref={heroRef} id="start" className="relative z-10 -mt-24 h-[280vh] md:h-[480vh]">
         <div className="sticky top-0 h-screen overflow-hidden">
           <div id="hero-main-text" className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center will-change-transform">
             <div
-              className="transition-all duration-[1500ms] ease-out"
               style={{
                 opacity: mounted ? 1 : 0,
-                transform: mounted ? "scale(1) translateY(0)" : "scale(0.85) translateY(60px)",
+                transform: mounted ? "scale(1) translateY(0)" : "scale(0.88) translateY(60px)",
                 filter: mounted ? "blur(0px)" : "blur(12px)",
+                transition: "opacity 1.6s cubic-bezier(0.16,1,0.3,1), transform 1.6s cubic-bezier(0.16,1,0.3,1), filter 1.6s cubic-bezier(0.16,1,0.3,1)",
               }}
             >
+              <span className="mb-5 inline-block rounded-full border border-white/30 bg-white/10 px-5 py-2 text-sm font-semibold text-white/90 backdrop-blur-sm">
+                خبرة تمتد لأكثر من ٢٠ عاماً
+              </span>
               <h1 className="text-white drop-shadow-2xl">
-                <span className="block text-7xl font-extrabold md:text-8xl lg:text-[9rem] tracking-tighter" style={{ textShadow: "0 20px 60px rgba(0,0,0,0.8)" }}>
+                <span
+                  className="block text-6xl font-extrabold md:text-8xl lg:text-[8.5rem] tracking-tight leading-none"
+                  style={{ textShadow: "0 10px 60px rgba(0,0,0,0.7)" }}
+                >
                   بناء للمقاولات
                 </span>
+                <span className="mt-4 block text-xl font-medium text-white/75 md:text-2xl" style={{ textShadow: "0 4px 20px rgba(0,0,0,0.8)" }}>
+                  نبني المستقبل بأيدٍ خبيرة وتقنيات حديثة
+                </span>
               </h1>
+              <div className="mt-10 flex flex-wrap justify-center gap-4">
+                <Link to="/contact" className="flex items-center gap-2 rounded-2xl bg-white px-8 py-4 text-sm font-bold text-gray-900 shadow-2xl transition-all hover:scale-105 hover:bg-white/95">
+                  <PhoneCall size={18} /> تواصل معنا
+                </Link>
+                <Link to="/projects" className="flex items-center gap-2 rounded-2xl border border-white/40 bg-white/10 px-8 py-4 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20">
+                  مشاريعنا <ArrowLeft size={16} />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════════
-          CONTENT PANEL — slides UP over the fixed video with blur effect
-         ═══════════════════════════════════════════════════════════════════ */}
+      {/* ═══ CONTENT PANEL — slides over the video ════════════════════════════ */}
       <div className="relative z-20">
-        {/* Glass transition strip */}
-        <div className="relative -mt-1">
-          <div className="absolute -top-20 left-0 right-0 h-20 bg-gradient-to-b from-transparent to-background/60 backdrop-blur-md pointer-events-none" />
-        </div>
+        <div className="absolute -top-24 left-0 right-0 h-24 bg-gradient-to-b from-transparent to-background/70 backdrop-blur-md pointer-events-none" />
 
-        <div className="rounded-t-[3rem] bg-background/95 backdrop-blur-2xl shadow-[0_-30px_80px_rgba(0,0,0,0.5)] border-t border-border">
+        <div className="rounded-t-[3rem] bg-background shadow-[0_-40px_100px_rgba(0,0,0,0.5)] border-t border-border overflow-hidden">
 
-          {/* ── Stats ─────────────────────────────────────────────────────── */}
+          {/* ── Stats bar ─────────────────────────────────────────────────── */}
           <RevealSection>
-            <section className="relative bg-muted py-12 rounded-t-[3rem]">
+            <section className="bg-primary/5 border-b border-border py-12">
               <div className="mx-auto max-w-7xl px-8">
-                <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+                <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
                   {STATS.map((s) => (
-                    <div key={s.label} className="text-center">
-                      <p className="text-3xl font-extrabold text-foreground md:text-5xl">{s.value}</p>
+                    <div key={s.label} className="group text-center">
+                      <p className="text-4xl font-extrabold text-foreground md:text-5xl group-hover:text-primary transition-colors">
+                        <AnimatedCounter targetValue={s.targetValue} prefix={s.prefix} suffix={s.suffix} />
+                      </p>
                       <p className="mt-2 text-sm font-medium text-muted-foreground">{s.label}</p>
                     </div>
                   ))}
@@ -290,28 +302,50 @@ function Index() {
 
           {/* ── About ─────────────────────────────────────────────────────── */}
           <RevealSection>
-            <section id="about" className="relative bg-background py-24">
+            <section id="about" className="py-24 bg-background">
               <div className="mx-auto max-w-7xl px-8">
-                <div className="rounded-[3rem] border border-border bg-card p-10 shadow-sm md:p-16">
-                  <span className="text-sm font-bold uppercase tracking-widest text-muted-foreground">عن الشركة</span>
-                  <h2 className="mt-3 max-w-3xl text-4xl font-bold leading-snug text-foreground md:text-5xl">
-                    ثلاثة عقود من البناء الحقيقي.
-                  </h2>
-                  <div className="mt-10 grid gap-10 md:grid-cols-2">
-                    <p className="text-lg leading-loose text-muted-foreground">
+                <div className="grid gap-16 md:grid-cols-2 items-center">
+                  {/* Text */}
+                  <div>
+                    <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary mb-4">عن الشركة</span>
+                    <h2 className="text-4xl font-bold leading-tight text-foreground md:text-5xl">
+                      ثلاثة عقود من البناء الحقيقي.
+                    </h2>
+                    <p className="mt-6 text-lg leading-loose text-muted-foreground">
                       تأسست شركة <strong className="text-foreground">بناء للمقاولات</strong> عام 2004، وعلى مدى أكثر من عشرين عاماً أثبتنا حضوراً راسخاً في قطاع البناء والتشييد. نمزج بين الخبرة المحلية العميقة والتقنيات الهندسية الحديثة لتقديم مشاريع استثنائية في وقتها وضمن ميزانيتها.
                     </p>
-                    <p className="text-lg leading-loose text-muted-foreground">
-                      فريقنا يضم أكثر من 500 مهندس وفني متخصص، ونمتلك أسطولاً متكاملاً من المعدات الثقيلة الحديثة. نؤمن أن كل مبنى يبنيه فريقنا هو إرث يبقى للأجيال القادمة، لذا نتعامل مع كل مشروع بمسؤولية واحترافية كاملة.
+                    <p className="mt-4 text-lg leading-loose text-muted-foreground">
+                      فريقنا يضم أكثر من 500 مهندس وفني متخصص، ونمتلك أسطولاً متكاملاً من المعدات الثقيلة الحديثة.
                     </p>
+                    <div className="mt-8 flex flex-wrap gap-3">
+                      {["ISO 9001:2015", "تصنيف أول", "خبرة +20 عام", "ضمان شامل", "+350 مشروع"].map((tag) => (
+                        <span key={tag} className="flex items-center gap-1.5 rounded-full border border-border bg-muted px-4 py-1.5 text-xs font-semibold text-foreground">
+                          <CheckCircle2 size={12} className="text-primary" /> {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="mt-10">
+                      <Link to="/about" className="inline-flex items-center gap-2 rounded-2xl bg-foreground px-8 py-4 text-sm font-bold text-background transition-all hover:opacity-90 hover:gap-3">
+                        اقرأ المزيد <ArrowLeft size={16} />
+                      </Link>
+                    </div>
                   </div>
-                  <div className="mt-10 flex flex-wrap gap-3">
-                    {["ISO 9001:2015", "تصنيف أول", "خبرة +20 عام", "ضمان شامل", "+350 مشروع"].map((tag) => (
-                      <span key={tag} className="rounded-full border border-border bg-muted px-5 py-2 text-sm font-semibold text-foreground">{tag}</span>
+                  {/* Feature cards */}
+                  <div className="grid grid-cols-2 gap-4">
+                    {[
+                      { icon: Building2, title: "٣٥٠+", sub: "مشروع منجز بنجاح" },
+                      { icon: HardHat, title: "٥٠٠+", sub: "مهندس وفني متخصص" },
+                      { icon: ShieldCheck, title: "١٠ سنوات", sub: "ضمان هيكلي" },
+                      { icon: Clock, title: "٢٤ ساعة", sub: "استجابة سريعة" },
+                    ].map(({ icon: Icon, title, sub }) => (
+                      <div key={title} className="rounded-2xl border border-border bg-card p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                          <Icon size={24} strokeWidth={1.5} />
+                        </div>
+                        <p className="text-2xl font-extrabold text-foreground">{title}</p>
+                        <p className="mt-1 text-sm text-muted-foreground">{sub}</p>
+                      </div>
                     ))}
-                  </div>
-                  <div className="mt-12">
-                    <Link to="/about" className="inline-flex rounded-2xl bg-foreground px-8 py-4 text-sm font-semibold text-background transition-all hover:opacity-90">اقرأ المزيد عنا</Link>
                   </div>
                 </div>
               </div>
@@ -320,28 +354,33 @@ function Index() {
 
           {/* ── Services ──────────────────────────────────────────────────── */}
           <RevealSection>
-            <section id="services" className="relative bg-muted/20 py-24">
+            <section id="services" className="py-24 bg-muted/30">
               <div className="mx-auto max-w-7xl px-8">
                 <div className="mb-14 text-center">
-                  <span className="text-sm font-bold uppercase tracking-widest text-muted-foreground">خدماتنا</span>
-                  <h2 className="mt-3 text-4xl font-bold text-foreground md:text-5xl">حلول بناء متكاملة.</h2>
+                  <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary mb-4">خدماتنا</span>
+                  <h2 className="text-4xl font-bold text-foreground md:text-5xl">حلول بناء متكاملة.</h2>
                   <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">نقدم طيفاً شاملاً من خدمات المقاولات، من الفكرة إلى التسليم.</p>
                 </div>
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                   {SERVICES.map(({ icon: Icon, title, desc }, i) => (
                     <RevealSection key={title} delay={i * 0.1}>
-                      <div className="group rounded-[2rem] border border-border bg-card p-8 shadow-sm transition-all duration-300 hover:border-foreground/30 hover:shadow-xl hover:-translate-y-1">
-                        <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-muted text-foreground border border-border transition-colors group-hover:bg-foreground group-hover:text-background">
-                          <Icon size={32} strokeWidth={1.5} />
+                      <div className="group h-full rounded-3xl border border-border bg-card p-8 shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-xl hover:-translate-y-2">
+                        <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:scale-110">
+                          <Icon size={28} strokeWidth={1.5} />
                         </div>
                         <h3 className="text-xl font-bold text-foreground">{title}</h3>
                         <p className="mt-4 text-base leading-relaxed text-muted-foreground">{desc}</p>
+                        <div className="mt-6 flex items-center gap-2 text-sm font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                          اعرف المزيد <ArrowLeft size={14} />
+                        </div>
                       </div>
                     </RevealSection>
                   ))}
                 </div>
-                <div className="mt-16 text-center">
-                  <Link to="/services" className="inline-flex rounded-2xl border border-border bg-card px-8 py-4 text-sm font-semibold text-foreground transition-all hover:border-foreground/50 hover:bg-muted">تصفح كافة الخدمات</Link>
+                <div className="mt-14 text-center">
+                  <Link to="/services" className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card px-8 py-4 text-sm font-semibold text-foreground transition-all hover:border-primary/50 hover:bg-muted hover:gap-3">
+                    تصفح كافة الخدمات <ArrowLeft size={16} />
+                  </Link>
                 </div>
               </div>
             </section>
@@ -349,36 +388,44 @@ function Index() {
 
           {/* ── Projects ──────────────────────────────────────────────────── */}
           <RevealSection>
-            <section id="projects" className="relative bg-background py-24">
+            <section id="projects" className="py-24 bg-background">
               <div className="mx-auto max-w-7xl px-8">
-                <div className="mb-14 text-center">
-                  <span className="text-sm font-bold uppercase tracking-widest text-muted-foreground">مشاريعنا</span>
-                  <h2 className="mt-3 text-4xl font-bold text-foreground md:text-5xl">أعمال تتحدث عن نفسها.</h2>
+                <div className="mb-14 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+                  <div>
+                    <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary mb-4">مشاريعنا</span>
+                    <h2 className="text-4xl font-bold text-foreground md:text-5xl">أعمال تتحدث عن نفسها.</h2>
+                  </div>
+                  <Link to="/projects" className="inline-flex shrink-0 items-center gap-2 rounded-2xl border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-all hover:bg-muted hover:gap-3">
+                    عرض الكل <ArrowLeft size={15} />
+                  </Link>
                 </div>
-                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {PROJECTS.map((p, i) => (
-                    <RevealSection key={p.name} delay={i * 0.08}>
-                      <div className="group relative overflow-hidden rounded-[2rem] border border-border bg-card shadow-sm transition-all duration-300 hover:border-foreground/30 hover:shadow-2xl hover:-translate-y-1 flex flex-col h-full">
-                        {/* Image Container */}
-                        <div className="relative h-48 w-full overflow-hidden bg-muted">
+                    <RevealSection key={p.name} delay={i * 0.07}>
+                      <div className="group relative overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-2xl hover:-translate-y-1 flex flex-col h-full">
+                        {/* Image */}
+                        <div className="relative h-52 w-full overflow-hidden bg-muted">
                           <img
                             src={p.image}
                             alt={p.name}
                             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                             loading="lazy"
                           />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                           <div className="absolute top-4 right-4">
                             <span className="inline-flex rounded-full bg-background/90 backdrop-blur px-3 py-1 text-xs font-bold text-foreground shadow-sm border border-border">{p.cat}</span>
                           </div>
                         </div>
-
                         {/* Content */}
-                        <div className="flex flex-col flex-1 p-6 md:p-8">
-                          <h3 className="text-xl font-bold text-foreground mb-3">{p.name}</h3>
-                          <div className="mt-auto flex items-center justify-between pt-5 border-t border-border">
-                            <span className="flex items-center gap-2 text-sm font-bold text-foreground"><BadgeCheck size={18} className="text-muted-foreground" /> {p.year}</span>
-                            <span className="flex items-center gap-1.5 text-sm font-bold text-muted-foreground">
-                              <MapPin size={16} /> {p.location}
+                        <div className="flex flex-col flex-1 p-6">
+                          <h3 className="text-lg font-bold text-foreground mb-2">{p.name}</h3>
+                          <p className="text-sm text-muted-foreground mb-auto">{p.details}</p>
+                          <div className="mt-5 flex items-center justify-between pt-4 border-t border-border">
+                            <span className="flex items-center gap-1.5 text-sm font-bold text-green-600">
+                              <BadgeCheck size={16} /> {p.year}
+                            </span>
+                            <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                              <MapPin size={14} /> {p.location}
                             </span>
                           </div>
                         </div>
@@ -386,8 +433,40 @@ function Index() {
                     </RevealSection>
                   ))}
                 </div>
-                <div className="mt-16 text-center">
-                  <Link to="/projects" className="inline-flex rounded-2xl border border-border bg-card px-8 py-4 text-sm font-semibold text-foreground transition-all hover:border-foreground/50 hover:bg-muted">عرض معرض المشاريع</Link>
+              </div>
+            </section>
+          </RevealSection>
+
+          {/* ── Testimonials ──────────────────────────────────────────────── */}
+          <RevealSection>
+            <section className="py-24 bg-muted/30">
+              <div className="mx-auto max-w-7xl px-8">
+                <div className="mb-14 text-center">
+                  <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary mb-4">آراء عملائنا</span>
+                  <h2 className="text-4xl font-bold text-foreground md:text-5xl">ماذا يقول عملاؤنا؟</h2>
+                </div>
+                <div className="grid gap-6 md:grid-cols-3">
+                  {TESTIMONIALS.map((t, i) => (
+                    <RevealSection key={t.name} delay={i * 0.1}>
+                      <div className="flex h-full flex-col rounded-3xl border border-border bg-card p-8 shadow-sm hover:shadow-lg transition-shadow">
+                        <div className="flex gap-1 mb-4">
+                          {[...Array(t.stars)].map((_, si) => (
+                            <Star key={si} size={16} className="fill-amber-400 text-amber-400" />
+                          ))}
+                        </div>
+                        <p className="flex-1 text-base leading-loose text-muted-foreground">"{t.text}"</p>
+                        <div className="mt-6 flex items-center gap-3 pt-4 border-t border-border">
+                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                            {t.name.charAt(3)}
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-foreground">{t.name}</p>
+                            <p className="text-xs text-muted-foreground">{t.role}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </RevealSection>
+                  ))}
                 </div>
               </div>
             </section>
@@ -395,53 +474,98 @@ function Index() {
 
           {/* ── FAQ ───────────────────────────────────────────────────────── */}
           <RevealSection>
-            <section id="faq" className="relative bg-muted/20 py-24">
+            <section id="faq" className="py-24 bg-background">
               <div className="mx-auto max-w-4xl px-8">
-                <div className="rounded-[3rem] border border-border bg-card p-10 shadow-sm md:p-16">
-                  <span className="text-sm font-bold uppercase tracking-widest text-muted-foreground">الأسئلة الشائعة</span>
-                  <h2 className="mt-3 text-4xl font-bold text-foreground md:text-5xl">لديك سؤال؟</h2>
-                  <div className="mt-12 divide-y divide-border">
-                    {FAQ.map((item) => (
-                      <details key={item.q} className="group py-6">
-                        <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-bold text-foreground">
-                          {item.q}
-                          <ChevronDown className="shrink-0 text-muted-foreground transition-transform group-open:rotate-180" size={24} />
-                        </summary>
-                        <p className="mt-4 text-base leading-loose text-muted-foreground">{item.a}</p>
-                      </details>
-                    ))}
+                <div className="mb-14 text-center">
+                  <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary mb-4">الأسئلة الشائعة</span>
+                  <h2 className="text-4xl font-bold text-foreground md:text-5xl">لديك سؤال؟</h2>
+                </div>
+                <div className="divide-y divide-border rounded-3xl border border-border bg-card overflow-hidden shadow-sm">
+                  {FAQ.map((item, i) => (
+                    <div key={item.q}>
+                      <button
+                        onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                        className="flex w-full cursor-pointer items-center justify-between gap-4 p-6 text-right text-lg font-bold text-foreground hover:bg-muted/50 transition-colors"
+                      >
+                        {item.q}
+                        <ChevronDown
+                          className={`shrink-0 text-muted-foreground transition-transform duration-300 ${openFaq === i ? "rotate-180" : ""}`}
+                          size={22}
+                        />
+                      </button>
+                      <div
+                        style={{
+                          maxHeight: openFaq === i ? "300px" : "0",
+                          overflow: "hidden",
+                          transition: "max-height 0.4s cubic-bezier(0.16,1,0.3,1)",
+                        }}
+                      >
+                        <p className="px-6 pb-6 text-base leading-loose text-muted-foreground">{item.a}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          </RevealSection>
+
+          {/* ── CTA Contact ───────────────────────────────────────────────── */}
+          <RevealSection>
+            <section id="contact" className="py-24 bg-foreground text-background">
+              <div className="mx-auto max-w-5xl px-8">
+                <div className="grid gap-12 md:grid-cols-2 items-center">
+                  <div>
+                    <span className="inline-block rounded-full bg-background/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-background/70 mb-4">تواصل معنا</span>
+                    <h2 className="text-4xl font-bold leading-tight md:text-5xl">
+                      مشروعك التالي يبدأ هنا.
+                    </h2>
+                    <p className="mt-6 text-lg leading-loose text-background/70">
+                      تواصل مع فريقنا الهندسي اليوم للحصول على استشارة مجانية وعرض سعر تفصيلي لمشروعك.
+                    </p>
+                    <div className="mt-8 space-y-4">
+                      <a href="tel:+967777000000" className="flex items-center gap-3 text-background/80 hover:text-background transition-colors">
+                        <PhoneCall size={18} /> <span className="font-semibold">+967 777 000 000</span>
+                      </a>
+                      <a href="mailto:info@benaa.ye" className="flex items-center gap-3 text-background/80 hover:text-background transition-colors">
+                        <Mail size={18} /> <span className="font-semibold">info@benaa.ye</span>
+                      </a>
+                      <div className="flex items-center gap-3 text-background/80">
+                        <MapPin size={18} /> <span className="font-semibold">عدن، اليمن</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="rounded-3xl bg-background/10 border border-background/20 p-8 backdrop-blur-sm">
+                    <h3 className="text-xl font-bold text-background mb-6">أرسل رسالة</h3>
+                    <div className="space-y-4">
+                      <input
+                        type="text"
+                        placeholder="الاسم الكامل"
+                        className="w-full rounded-xl border border-background/20 bg-background/10 px-4 py-3 text-background placeholder:text-background/50 focus:outline-none focus:border-background/50 transition-colors"
+                      />
+                      <input
+                        type="tel"
+                        placeholder="رقم الهاتف"
+                        className="w-full rounded-xl border border-background/20 bg-background/10 px-4 py-3 text-background placeholder:text-background/50 focus:outline-none focus:border-background/50 transition-colors"
+                      />
+                      <textarea
+                        rows={4}
+                        placeholder="تفاصيل المشروع..."
+                        className="w-full rounded-xl border border-background/20 bg-background/10 px-4 py-3 text-background placeholder:text-background/50 focus:outline-none focus:border-background/50 transition-colors resize-none"
+                      />
+                      <button className="w-full rounded-xl bg-background px-6 py-3.5 text-sm font-bold text-foreground transition-all hover:bg-background/90 hover:scale-[1.02] active:scale-100">
+                        إرسال الطلب
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </section>
           </RevealSection>
 
-          {/* ── Contact ───────────────────────────────────────────────────── */}
-          <RevealSection>
-            <section id="contact" className="relative bg-card border-t border-border py-32">
-              <div className="mx-auto max-w-4xl px-8 text-center">
-                <span className="text-sm font-bold uppercase tracking-widest text-muted-foreground">تواصل معنا</span>
-                <h2 className="mt-4 text-5xl font-extrabold text-foreground md:text-6xl tracking-tight">مشروعك التالي يبدأ هنا.</h2>
-                <p className="mx-auto mt-6 max-w-2xl text-xl text-muted-foreground">
-                  تواصل مع فريقنا الهندسي اليوم للحصول على استشارة مجانية وعرض سعر تفصيلي لمشروعك.
-                </p>
-                <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
-                  <a href="tel:+966500000000" className="flex items-center gap-3 rounded-2xl bg-foreground px-8 py-4 text-lg font-bold text-background shadow-2xl transition-all hover:opacity-90">
-                    <PhoneCall size={20} /> اتصل الآن
-                  </a>
-                  <Link to="/contact" className="rounded-2xl border border-border bg-card px-8 py-4 text-lg font-semibold text-foreground transition-all hover:bg-muted">
-                    صفحة التواصل
-                  </Link>
-                </div>
-              </div>
-            </section>
-          </RevealSection>
 
-          {/* Footer moved to layout */}
 
         </div>
       </div>
-
     </div>
   );
 }

@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useLocation,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -93,6 +94,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         rel: "stylesheet",
+        href: "https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css",
+      },
+      {
+        rel: "stylesheet",
         href: appCss,
       },
     ],
@@ -122,6 +127,8 @@ import { Footer } from "../components/Footer";
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const location = useLocation();
+  const isHome = location.pathname === "/";
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -131,6 +138,7 @@ function RootComponent() {
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
         </main>
+        {/* Global Footer */}
         <Footer />
       </div>
     </QueryClientProvider>

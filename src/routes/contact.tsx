@@ -35,7 +35,7 @@ function ContactPage() {
             {/* Arch Image Placeholder */}
             <div className="absolute inset-0 mx-auto w-4/5 overflow-hidden rounded-t-[200px] bg-muted/50 shadow-2xl">
               <img 
-                src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=2070&auto=format&fit=crop" 
+                src="https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
                 alt="مكتب العمل" 
                 className="h-full w-full object-cover"
               />
