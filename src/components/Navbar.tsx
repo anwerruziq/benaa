@@ -24,16 +24,16 @@ export function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300">
-      <nav className="mx-auto w-full max-w-7xl px-6 py-4">
+      <nav className="mx-auto w-full max-w-5xl px-4 py-3">
         <div 
-          className={`flex items-center justify-between rounded-full border px-6 py-3 transition-all duration-500 ${
+          className={`flex items-center justify-between rounded-full border px-5 py-2 transition-all duration-500 ${
             isScrolled 
               ? "border-border/50 bg-background/70 shadow-lg backdrop-blur-xl" 
               : "border-transparent bg-transparent backdrop-blur-sm"
           }`}
         >
           <Link to="/" className="flex items-center gap-3">
-            <img src="/logo.png" alt="بناء للمقاولات" className="h-14 w-auto object-contain drop-shadow-sm transition-transform duration-300 hover:scale-105" />
+            <img src="/logo.png" alt="بناء للمقاولات" className="h-11 w-auto object-contain drop-shadow-sm transition-transform duration-300 hover:scale-105" />
           </Link>
           <ul className="hidden items-center gap-8 md:flex">
             {NAV_ITEMS.map((item) => (

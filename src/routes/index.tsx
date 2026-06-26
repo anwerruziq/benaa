@@ -9,7 +9,7 @@ import {
 import { Link } from "@tanstack/react-router";
 import { AnimatedCounter } from "../components/AnimatedCounter";
 
-export const Route = createFileRoute("/")(({
+export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "بناء للمقاولات" },
@@ -19,10 +19,11 @@ export const Route = createFileRoute("/")(({
     ],
     links: [
       { rel: "icon", type: "image/png", href: "/logo.png" },
+      { rel: "preload", as: "video", type: "video/mp4", href: "/YouCut_20260624_205134948.mp4" },
     ],
   }),
   component: Index,
-} as Parameters<typeof createFileRoute<"/">>[0]));
+});
 
 const VIDEO_URL = "/YouCut_20260624_205134948.mp4";
 
@@ -115,8 +116,10 @@ function Index() {
     let duration = 0;
     let rafId: number;
     let currentSmooth = 0;
+    let lastSetTime = -1;
     const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-    const LERP_FACTOR = isMobile ? 0.04 : 0.08; // slower = smoother
+    // Increased LERP on mobile for snappier tracking without floating lag
+    const LERP_FACTOR = isMobile ? 0.07 : 0.08; 
 
     const clamp = (v: number, lo: number, hi: number) => v < lo ? lo : v > hi ? hi : v;
 
@@ -136,8 +139,13 @@ function Index() {
       if (duration <= 0) return;
       const target = getTargetTime();
       currentSmooth += (target - currentSmooth) * LERP_FACTOR;
-      const diff = Math.abs(currentSmooth - video.currentTime);
-      if (diff > 0.015) {
+      
+      const diff = Math.abs(currentSmooth - lastSetTime);
+      // Use a higher threshold on mobile so we don't choke the video decoder with micro-updates
+      const threshold = isMobile ? 0.05 : 0.015;
+      
+      if (diff > threshold) {
+        lastSetTime = currentSmooth;
         try { video.currentTime = clamp(currentSmooth, 0, duration - 0.1); } catch { /* ignore */ }
       }
     };
@@ -188,12 +196,11 @@ function Index() {
         overlay.style.opacity = `${0.25 + progress * 0.3}`;
       }
 
-      // Bg blur only when hero leaves viewport
+      // No blur, just fade out slightly when hero leaves viewport
       const bg = document.getElementById("video-bg-container");
       if (bg) {
         if (overscroll > 0) {
-          const blurVal = Math.min(overscroll / 22, 14);
-          bg.style.filter = `blur(${blurVal.toFixed(1)}px)`;
+          bg.style.filter = "";
           bg.style.opacity = `${Math.max(0.5, 1 - overscroll / 700)}`;
         } else {
           bg.style.filter = "";
@@ -254,21 +261,21 @@ function Index() {
               </span>
               <h1 className="text-white drop-shadow-2xl">
                 <span
-                  className="block text-6xl font-extrabold md:text-8xl lg:text-[8.5rem] tracking-tight leading-none"
+                  className="block text-5xl font-extrabold md:text-7xl lg:text-[7rem] tracking-tight leading-none"
                   style={{ textShadow: "0 10px 60px rgba(0,0,0,0.7)" }}
                 >
                   بناء للمقاولات
                 </span>
-                <span className="mt-4 block text-xl font-medium text-white/75 md:text-2xl" style={{ textShadow: "0 4px 20px rgba(0,0,0,0.8)" }}>
+                <span className="mt-4 block text-lg font-medium text-white/75 md:text-xl" style={{ textShadow: "0 4px 20px rgba(0,0,0,0.8)" }}>
                   نبني المستقبل بأيدٍ خبيرة وتقنيات حديثة
                 </span>
               </h1>
-              <div className="mt-10 flex flex-wrap justify-center gap-4">
-                <Link to="/contact" className="flex items-center gap-2 rounded-2xl bg-white px-8 py-4 text-sm font-bold text-gray-900 shadow-2xl transition-all hover:scale-105 hover:bg-white/95">
-                  <PhoneCall size={18} /> تواصل معنا
+              <div className="mt-8 flex flex-wrap justify-center gap-3">
+                <Link to="/contact" className="flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-gray-900 shadow-xl transition-all hover:scale-105 hover:bg-white/95">
+                  <PhoneCall size={16} /> تواصل معنا
                 </Link>
-                <Link to="/projects" className="flex items-center gap-2 rounded-2xl border border-white/40 bg-white/10 px-8 py-4 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20">
-                  مشاريعنا <ArrowLeft size={16} />
+                <Link to="/projects" className="flex items-center gap-2 rounded-xl border border-white/40 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20">
+                  مشاريعنا <ArrowLeft size={14} />
                 </Link>
               </div>
             </div>
