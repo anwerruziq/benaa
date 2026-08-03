@@ -14,6 +14,7 @@ export const Route = createFileRoute("/")({
 });
 
 const VIDEO_URL = "/YouCut_20260624_205134948.mp4";
+const LOADING_VIDEO_URL = "/Loading Animation - After Effects SUPER EASY Tutorial(MP4).mp4";
 
 const SERVICES = [
   { icon: Building2, title: "البناء والتشييد", desc: "تنفيذ المباني السكنية والتجارية بأعلى مواصفات الجودة والأمان، من الأساس حتى التسليم." },
@@ -93,6 +94,7 @@ function Index() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [mounted, setMounted] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -146,11 +148,23 @@ function Index() {
       rafId = requestAnimationFrame(tick);
     };
 
+    const onDataLoaded = () => {
+      setIsVideoLoaded(true);
+    };
+
     if (video.readyState >= 1) onMeta();
     else video.addEventListener("loadedmetadata", onMeta);
 
+    if (video.readyState >= 3) onDataLoaded();
+    else {
+      video.addEventListener("canplay", onDataLoaded);
+      video.addEventListener("loadeddata", onDataLoaded);
+    }
+
     return () => {
       video.removeEventListener("loadedmetadata", onMeta);
+      video.removeEventListener("canplay", onDataLoaded);
+      video.removeEventListener("loadeddata", onDataLoaded);
       cancelAnimationFrame(rafId);
     };
   }, []);
@@ -216,9 +230,19 @@ function Index() {
         className="fixed inset-0 z-0 h-screen w-full"
         style={{ willChange: "filter, opacity" }}
       >
+        {/* Loading Video Background */}
+        <video
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${isVideoLoaded ? "opacity-0" : "opacity-100"}`}
+          src={LOADING_VIDEO_URL}
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
+        {/* Main Video Background */}
         <video
           ref={videoRef}
-          className="absolute inset-0 h-full w-full object-cover"
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${isVideoLoaded ? "opacity-100" : "opacity-0"}`}
           style={{ transform: "translateZ(0)", backfaceVisibility: "hidden", willChange: "transform" }}
           src={VIDEO_URL}
           muted
