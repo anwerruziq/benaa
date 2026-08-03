@@ -14,7 +14,7 @@ export const Route = createFileRoute("/")({
 });
 
 const VIDEO_URL = "/YouCut_20260624_205134948.mp4";
-const LOADING_VIDEO_URL = "/Loading Animation - After Effects SUPER EASY Tutorial(MP4).mp4";
+const LOADING_IMAGE_URL = "/6 Infinite Loop Loading Animation After Effect Template(GIF).gif";
 
 const SERVICES = [
   { icon: Building2, title: "البناء والتشييد", desc: "تنفيذ المباني السكنية والتجارية بأعلى مواصفات الجودة والأمان، من الأساس حتى التسليم." },
@@ -239,13 +239,10 @@ function Index() {
       <div 
         className={`fixed inset-0 z-[100] flex items-center justify-center bg-black transition-opacity duration-1000 ${isVideoLoaded ? "opacity-0 pointer-events-none" : "opacity-100"}`}
       >
-        <video
+        <img
           className="absolute inset-0 h-full w-full object-contain"
-          src={LOADING_VIDEO_URL}
-          autoPlay
-          loop
-          muted
-          playsInline
+          src={LOADING_IMAGE_URL}
+          alt="Loading..."
         />
       </div>
 
