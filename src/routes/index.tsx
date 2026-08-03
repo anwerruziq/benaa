@@ -240,20 +240,13 @@ function Index() {
         className={`fixed inset-0 z-[100] flex items-center justify-center bg-black transition-opacity duration-1000 ${isVideoLoaded ? "opacity-0 pointer-events-none" : "opacity-100"}`}
       >
         <video
-          className="absolute inset-0 h-full w-full object-cover opacity-60"
+          className="absolute inset-0 h-full w-full object-contain"
           src={LOADING_VIDEO_URL}
           autoPlay
           loop
           muted
           playsInline
         />
-        <div className="relative z-10 flex flex-col items-center gap-6 text-white text-center">
-          <div className="h-16 w-16 animate-spin rounded-full border-4 border-primary border-t-transparent shadow-[0_0_15px_rgba(var(--primary),0.5)]"></div>
-          <div>
-            <h2 className="text-2xl font-bold tracking-wider drop-shadow-lg">بناء للمقاولات</h2>
-            <p className="mt-2 text-sm text-white/80 font-medium tracking-wide">جاري تجهيز الموقع...</p>
-          </div>
-        </div>
       </div>
 
       {/* ── FIXED VIDEO BACKGROUND ──────────────────────────────────────── */}
