@@ -108,8 +108,8 @@ function Index() {
     let currentSmooth = 0;
     let lastSetTime = -1;
     const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-    // Increased LERP on mobile for snappier tracking without floating lag
-    const LERP_FACTOR = isMobile ? 0.07 : 0.08; 
+    // Snappy tracking: highly responsive to finger movement
+    const LERP_FACTOR = isMobile ? 0.35 : 0.15; 
 
     const clamp = (v: number, lo: number, hi: number) => v < lo ? lo : v > hi ? hi : v;
 
@@ -131,8 +131,8 @@ function Index() {
       currentSmooth += (target - currentSmooth) * LERP_FACTOR;
       
       const diff = Math.abs(currentSmooth - lastSetTime);
-      // Use a higher threshold on mobile so we don't choke the video decoder with micro-updates
-      const threshold = isMobile ? 0.05 : 0.015;
+      // Extremely low threshold for buttery smooth updates
+      const threshold = 0.005; 
       
       if (diff > threshold) {
         lastSetTime = currentSmooth;
