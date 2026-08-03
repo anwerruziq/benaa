@@ -14,7 +14,7 @@ export const Route = createFileRoute("/")({
 });
 
 const VIDEO_URL = "/YouCut_20260624_205134948.mp4";
-const LOADING_IMAGE_URL = "/6 Infinite Loop Loading Animation After Effect Template(GIF).gif";
+const LOADING_IMAGE_URL = "/loading.gif";
 
 const SERVICES = [
   { icon: Building2, title: "البناء والتشييد", desc: "تنفيذ المباني السكنية والتجارية بأعلى مواصفات الجودة والأمان، من الأساس حتى التسليم." },
