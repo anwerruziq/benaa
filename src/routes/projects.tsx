@@ -2,12 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { BadgeCheck, MapPin } from "lucide-react";
 
 export const Route = createFileRoute("/projects")({
-  head: () => ({
-    meta: [
-      { title: "مشاريعنا | بناء للمقاولات" },
-      { name: "description", content: "معرض مشاريع شركة بناء للمقاولات، اكتشف أحدث وأكبر أعمالنا في التشييد." },
-    ],
-  }),
   component: ProjectsPage,
 });
 

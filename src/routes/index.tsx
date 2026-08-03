@@ -10,18 +10,6 @@ import { Link } from "@tanstack/react-router";
 import { AnimatedCounter } from "../components/AnimatedCounter";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "بناء للمقاولات" },
-      { name: "description", content: "شركة بناء للمقاولات — خبرة عشرين عاماً في البناء والتشييد والمقاولات العامة بأعلى معايير الجودة." },
-      { property: "og:title", content: "بناء للمقاولات" },
-      { property: "og:description", content: "نبني المستقبل بأيدٍ خبيرة وتقنيات حديثة." },
-    ],
-    links: [
-      { rel: "icon", type: "image/png", href: "/logo.png" },
-      { rel: "preload", as: "video", type: "video/mp4", href: "/YouCut_20260624_205134948.mp4" },
-    ],
-  }),
   component: Index,
 });
 

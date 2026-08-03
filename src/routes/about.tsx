@@ -2,12 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/about")({
-  head: () => ({
-    meta: [
-      { title: "عن الشركة | بناء للمقاولات" },
-      { name: "description", content: "تعرف على شركة بناء للمقاولات وتاريخها العريق في قطاع التشييد والبناء." },
-    ],
-  }),
   component: AboutPage,
 });
 

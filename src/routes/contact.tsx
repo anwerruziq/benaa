@@ -2,12 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PhoneCall, Mail, MapPin, Send, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({
-    meta: [
-      { title: "تواصل معنا | بناء للمقاولات" },
-      { name: "description", content: "تواصل مع فريق بناء للمقاولات لطلب عرض سعر أو الاستفسار عن خدماتنا." },
-    ],
-  }),
   component: ContactPage,
 });
 

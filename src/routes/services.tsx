@@ -2,12 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Building2, Ruler, HardHat, ShieldCheck, CheckCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/services")({
-  head: () => ({
-    meta: [
-      { title: "خدماتنا | بناء للمقاولات" },
-      { name: "description", content: "تعرف على الخدمات الهندسية والإنشائية التي نقدمها في شركة بناء للمقاولات." },
-    ],
-  }),
   component: ServicesPage,
 });
 
