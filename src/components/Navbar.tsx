@@ -44,10 +44,7 @@ export function Navbar() {
               </li>
             ))}
           </ul>
-          <Link to="/contact" className="hidden rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/90 hover:shadow-lg md:flex items-center gap-2 hover:-translate-y-0.5">
-            <PhoneCall size={16} />
-            اتصل بنا
-          </Link>
+
           <button 
             type="button" 
             aria-label="القائمة" 
@@ -74,13 +71,7 @@ export function Navbar() {
                 </li>
               ))}
             </ul>
-            <Link 
-              to="/contact" 
-              onClick={() => setOpen(false)} 
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-5 py-4 text-base font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/90 active:scale-95"
-            >
-              <PhoneCall size={18} /> اتصل بنا الآن
-            </Link>
+
           </div>
         )}
       </nav>

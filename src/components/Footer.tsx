@@ -4,9 +4,9 @@ import { Link } from "@tanstack/react-router";
 export function Footer() {
   return (
     <footer className="border-t border-border bg-background py-8 z-20 relative">
-      <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 px-8 lg:flex-row lg:items-start lg:gap-12">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
         {/* Brand & About */}
-        <div className="flex-1 max-w-xs">
+        <div>
           <Link to="/" className="inline-block mb-4">
             <img src="/logo.png" alt="بناء للمقاولات" className="h-16 w-auto object-contain" />
           </Link>
@@ -32,7 +32,7 @@ export function Footer() {
         </div>
 
         {/* Navigation */}
-        <div className="flex-none">
+        <div>
           <h4 className="mb-4 text-sm font-bold uppercase tracking-widest text-foreground">التنقل</h4>
           <ul className="space-y-2">
             {[
@@ -52,7 +52,7 @@ export function Footer() {
         </div>
 
         {/* Services */}
-        <div className="flex-none">
+        <div>
           <h4 className="mb-4 text-sm font-bold uppercase tracking-widest text-foreground">خدماتنا</h4>
           <ul className="space-y-2">
             {[
@@ -72,7 +72,7 @@ export function Footer() {
         </div>
 
         {/* Contact info */}
-        <div className="flex-1 max-w-sm">
+        <div>
           <h4 className="mb-4 text-sm font-bold uppercase tracking-widest text-foreground">تواصل معنا</h4>
           <ul className="space-y-3">
             <li className="flex items-start gap-3">

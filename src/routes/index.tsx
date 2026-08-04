@@ -1,4 +1,3 @@
-// Local video served from the public folder
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import {
@@ -8,13 +7,11 @@ import {
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { AnimatedCounter } from "../components/AnimatedCounter";
+import { ScrollFrameSequence } from "../components/ScrollFrameSequence";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
-
-const VIDEO_URL = "/YouCut_20260624_205134948.mp4";
-const LOADING_IMAGE_URL = "/loading.gif";
 
 const SERVICES = [
   { icon: Building2, title: "البناء والتشييد", desc: "تنفيذ المباني السكنية والتجارية بأعلى مواصفات الجودة والأمان، من الأساس حتى التسليم." },
@@ -90,223 +87,13 @@ function RevealSection({ children, className = "", delay = 0 }: { children: Reac
 
 // ─── Main Component ──────────────────────────────────────────────────────────
 function Index() {
-  const heroRef = useRef<HTMLElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [mounted, setMounted] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-
-  useEffect(() => { setMounted(true); }, []);
-
-  /* ── Scroll-driven video — longer scrub range, smoother lerp ─────────── */
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    let duration = 0;
-    let rafId: number;
-    let currentSmooth = 0;
-    let lastSetTime = -1;
-    const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-    // Snappy tracking: highly responsive to finger movement
-    const LERP_FACTOR = isMobile ? 0.35 : 0.15; 
-
-    const clamp = (v: number, lo: number, hi: number) => v < lo ? lo : v > hi ? hi : v;
-
-    const getTargetTime = (): number => {
-      const hero = heroRef.current;
-      if (!hero || duration <= 0) return 0;
-      const rect = hero.getBoundingClientRect();
-      // Use full scrollable range of hero
-      const scrollableRange = Math.max(1, hero.offsetHeight - window.innerHeight);
-      const progress = clamp(-rect.top / scrollableRange, 0, 1);
-      // Map to full video duration (leave 0.1s buffer at end)
-      return progress * (duration - 0.1);
-    };
-
-    const tick = () => {
-      rafId = requestAnimationFrame(tick);
-      if (duration <= 0) return;
-      const target = getTargetTime();
-      currentSmooth += (target - currentSmooth) * LERP_FACTOR;
-      
-      const diff = Math.abs(currentSmooth - lastSetTime);
-      // Extremely low threshold for buttery smooth updates
-      const threshold = 0.005; 
-      
-      if (diff > threshold) {
-        lastSetTime = currentSmooth;
-        try { video.currentTime = clamp(currentSmooth, 0, duration - 0.1); } catch { /* ignore */ }
-      }
-    };
-
-    const onMeta = () => {
-      duration = Number.isFinite(video.duration) ? video.duration : 0;
-      video.pause();
-      currentSmooth = getTargetTime();
-      try { video.currentTime = currentSmooth; } catch { /* ignore */ }
-      rafId = requestAnimationFrame(tick);
-    };
-
-    const onDataLoaded = () => {
-      setIsVideoLoaded(true);
-    };
-
-    if (video.readyState >= 1) onMeta();
-    else video.addEventListener("loadedmetadata", onMeta);
-
-    if (video.readyState >= 3) onDataLoaded();
-    else {
-      video.addEventListener("canplay", onDataLoaded);
-      video.addEventListener("loadeddata", onDataLoaded);
-    }
-
-    return () => {
-      video.removeEventListener("loadedmetadata", onMeta);
-      video.removeEventListener("canplay", onDataLoaded);
-      video.removeEventListener("loadeddata", onDataLoaded);
-      cancelAnimationFrame(rafId);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isVideoLoaded) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isVideoLoaded]);
-
-  /* ── Video overlay opacity on scroll (less aggressive darkening) ──────── */
-  useEffect(() => {
-    let rafPending = false;
-
-    const updateBg = () => {
-      rafPending = false;
-      const hero = heroRef.current;
-      const overlay = document.getElementById("video-overlay");
-      const textEl = document.getElementById("hero-main-text");
-      if (!hero) return;
-
-      const rect = hero.getBoundingClientRect();
-      const overscroll = Math.max(0, window.innerHeight - rect.bottom);
-      const scrollY = window.scrollY;
-
-      // Text parallax + fade
-      if (textEl) {
-        const textOpacity = Math.max(0, 1 - scrollY / 600);
-        textEl.style.opacity = `${textOpacity}`;
-        textEl.style.transform = `translateY(${-scrollY * 0.28}px)`;
-        textEl.style.filter = `blur(${Math.min(scrollY / 100, 12)}px)`;
-      }
-
-      // Overlay stays light (max 0.55 opacity) so video is always vivid
-      if (overlay) {
-        const progress = clamp(scrollY / 400, 0, 1);
-        overlay.style.opacity = `${0.25 + progress * 0.3}`;
-      }
-
-      // No blur, just fade out slightly when hero leaves viewport
-      const bg = document.getElementById("video-bg-container");
-      if (bg) {
-        if (overscroll > 0) {
-          bg.style.filter = "";
-          bg.style.opacity = `${Math.max(0.5, 1 - overscroll / 700)}`;
-        } else {
-          bg.style.filter = "";
-          bg.style.opacity = "1";
-        }
-      }
-    };
-
-    const clamp = (v: number, lo: number, hi: number) => v < lo ? lo : v > hi ? hi : v;
-
-    const onScroll = () => {
-      if (!rafPending) { rafPending = true; requestAnimationFrame(updateBg); }
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   return (
     <div className="relative min-h-screen" dir="rtl">
 
-      {/* ── FULL SCREEN LOADING OVERLAY ─────────────────────────────────── */}
-      <div 
-        className={`fixed inset-0 z-[100] flex items-center justify-center bg-black transition-opacity duration-1000 ${isVideoLoaded ? "opacity-0 pointer-events-none" : "opacity-100"}`}
-      >
-        <img
-          className="absolute inset-0 h-full w-full object-contain"
-          src={LOADING_IMAGE_URL}
-          alt="Loading..."
-        />
-      </div>
-
-      {/* ── FIXED VIDEO BACKGROUND ──────────────────────────────────────── */}
-      <div
-        id="video-bg-container"
-        className="fixed inset-0 z-0 h-screen w-full"
-        style={{ willChange: "filter, opacity" }}
-      >
-        {/* Main Video Background */}
-        <video
-          ref={videoRef}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${isVideoLoaded ? "opacity-100" : "opacity-0"}`}
-          style={{ transform: "translateZ(0)", backfaceVisibility: "hidden", willChange: "transform" }}
-          src={VIDEO_URL}
-          muted
-          playsInline
-          preload="auto"
-          disablePictureInPicture
-        />
-        {/* Static gradient base — light overlay so video is vivid */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60" />
-        {/* Dynamic overlay controlled by JS */}
-        <div id="video-overlay" className="absolute inset-0 bg-black/25 transition-none" />
-      </div>
-
-      {/* ── Hero (scroll-driven video zone) — 480vh for full video playback ── */}
-      <section ref={heroRef} id="start" className="relative z-10 -mt-24 h-[280vh] md:h-[480vh]">
-        <div className="sticky top-0 h-screen overflow-hidden">
-          <div id="hero-main-text" className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center will-change-transform">
-            <div
-              style={{
-                opacity: mounted ? 1 : 0,
-                transform: mounted ? "scale(1) translateY(0)" : "scale(0.88) translateY(60px)",
-                filter: mounted ? "blur(0px)" : "blur(12px)",
-                transition: "opacity 1.6s cubic-bezier(0.16,1,0.3,1), transform 1.6s cubic-bezier(0.16,1,0.3,1), filter 1.6s cubic-bezier(0.16,1,0.3,1)",
-              }}
-            >
-              <span className="mb-5 inline-block rounded-full border border-white/30 bg-white/10 px-5 py-2 text-sm font-semibold text-white/90 backdrop-blur-sm">
-                خبرة تمتد لأكثر من ٢٠ عاماً
-              </span>
-              <h1 className="text-white drop-shadow-2xl">
-                <span
-                  className="block text-5xl font-extrabold md:text-7xl lg:text-[7rem] tracking-tight leading-none"
-                  style={{ textShadow: "0 10px 60px rgba(0,0,0,0.7)" }}
-                >
-                  بناء للمقاولات
-                </span>
-                <span className="mt-4 block text-lg font-medium text-white/75 md:text-xl" style={{ textShadow: "0 4px 20px rgba(0,0,0,0.8)" }}>
-                  نبني المستقبل بأيدٍ خبيرة وتقنيات حديثة
-                </span>
-              </h1>
-              <div className="mt-8 flex flex-wrap justify-center gap-3">
-                <Link to="/contact" className="flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-gray-900 shadow-xl transition-all hover:scale-105 hover:bg-white/95">
-                  <PhoneCall size={16} /> تواصل معنا
-                </Link>
-                <Link to="/projects" className="flex items-center gap-2 rounded-xl border border-white/40 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20">
-                  مشاريعنا <ArrowLeft size={14} />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── Hero — scroll-linked frame sequence ────────────────────────── */}
+      <ScrollFrameSequence />
 
       {/* ═══ CONTENT PANEL — slides over the video ════════════════════════════ */}
       <div className="relative z-20">
